@@ -28,23 +28,13 @@ def allowed_file(filename):
 
 
 # ----------------------------- MODELS -----------------------------
-# class User(db.Model):
-#     id = db.Column(db.Integer , primary_key = True)
-#     username = db.Column(db.String(50) , nullable = False , unique=True)
-#     password = db.Column(db.Integer , unique = True , nullable = False)
-#     fullname = db.Column(db.String(50) , nullable = False)
-#     dob = db.Column(db.Date , nullable = False)
-
-
-
-
 class User(db.Model):
     id = db.Column(db.Integer , primary_key = True)
     username = db.Column(db.String(50) , nullable = False , unique=True)
     password = db.Column(db.Integer , unique = True , nullable = False)
     fullname = db.Column(db.String(50) , nullable = False)
     dob = db.Column(db.Date , nullable = False)
-    has_paid = db.Column(db.Boolean, default=False)   # <- NEW
+
 
 
 
@@ -550,59 +540,14 @@ def chapter_wise_quiz(quiz_id):
 
 
 
-# @app.route('/take/quiz/<int:quiz_id>/<int:chapter_id>', methods=['GET', 'POST'])
-# def take_quiz(quiz_id, chapter_id):
-#     if 'user_id' not in session:
-#         return redirect('/user/login')
-
-#     chapter = Chapter.query.get_or_404(chapter_id)
-#     questions = Question.query.filter_by(chapter_id=chapter.id).all()
-#     quiz = Quiz.query.get_or_404(quiz_id)
-
-#     if request.method == "POST":
-#         score = 0
-#         user_answers = {}
-#         for question in questions:
-#             ans = request.form.get(f'q{question.id}')
-#             user_answers[str(question.id)] = int(ans) if ans else None
-#             if ans and int(ans) == question.correct_option:
-#                 score += 1
-
-#         new_attempt = QuizAttempt(
-#             user_id=session['user_id'],
-#             quiz_id=quiz.id,
-#             chapter_id=chapter.id,
-#             score=score,
-#             answers=json.dumps(user_answers)
-#         )
-#         db.session.add(new_attempt)
-#         db.session.commit()
-
-#         return render_template('quiz_result.html', score=score, total=len(questions),
-#                                quiz_id=quiz.id, attempt_id=new_attempt.id)
-
-#     return render_template('take_quiz.html', quiz=quiz, chapter=chapter, questions=questions)
-
-
-
-
-
-
-
-
-
-@app.route('/take/quiz/<int:quiz_id>/<int:chapter_id>', methods=['GET','POST'])
+@app.route('/take/quiz/<int:quiz_id>/<int:chapter_id>', methods=['GET', 'POST'])
 def take_quiz(quiz_id, chapter_id):
     if 'user_id' not in session:
         return redirect('/user/login')
 
-    user = User.query.get(session['user_id'])
-    if not user.has_paid:   # <- BLOCK IF NOT PAID
-        return redirect(url_for('user_payment'))
-
     chapter = Chapter.query.get_or_404(chapter_id)
-    quiz = Quiz.query.get_or_404(quiz_id)
     questions = Question.query.filter_by(chapter_id=chapter.id).all()
+    quiz = Quiz.query.get_or_404(quiz_id)
 
     if request.method == "POST":
         score = 0
@@ -614,7 +559,7 @@ def take_quiz(quiz_id, chapter_id):
                 score += 1
 
         new_attempt = QuizAttempt(
-            user_id=user.id,
+            user_id=session['user_id'],
             quiz_id=quiz.id,
             chapter_id=chapter.id,
             score=score,
@@ -622,9 +567,54 @@ def take_quiz(quiz_id, chapter_id):
         )
         db.session.add(new_attempt)
         db.session.commit()
-        return render_template('quiz_result.html', score=score, total=len(questions) , quiz_id=quiz.id, attempt_id=new_attempt.id)
+
+        return render_template('quiz_result.html', score=score, total=len(questions),
+                               quiz_id=quiz.id, attempt_id=new_attempt.id)
 
     return render_template('take_quiz.html', quiz=quiz, chapter=chapter, questions=questions)
+
+
+
+
+
+
+
+
+
+# @app.route('/take/quiz/<int:quiz_id>/<int:chapter_id>', methods=['GET','POST'])
+# def take_quiz(quiz_id, chapter_id):
+#     if 'user_id' not in session:
+#         return redirect('/user/login')
+
+#     user = User.query.get(session['user_id'])
+#     if not user.has_paid:   # <- BLOCK IF NOT PAID
+#         return redirect(url_for('user_payment'))
+
+#     chapter = Chapter.query.get_or_404(chapter_id)
+#     quiz = Quiz.query.get_or_404(quiz_id)
+#     questions = Question.query.filter_by(chapter_id=chapter.id).all()
+
+#     if request.method == "POST":
+#         score = 0
+#         user_answers = {}
+#         for question in questions:
+#             ans = request.form.get(f'q{question.id}')
+#             user_answers[str(question.id)] = int(ans) if ans else None
+#             if ans and int(ans) == question.correct_option:
+#                 score += 1
+
+#         new_attempt = QuizAttempt(
+#             user_id=user.id,
+#             quiz_id=quiz.id,
+#             chapter_id=chapter.id,
+#             score=score,
+#             answers=json.dumps(user_answers)
+#         )
+#         db.session.add(new_attempt)
+#         db.session.commit()
+#         return render_template('quiz_result.html', score=score, total=len(questions) , quiz_id=quiz.id, attempt_id=new_attempt.id)
+
+#     return render_template('take_quiz.html', quiz=quiz, chapter=chapter, questions=questions)
 
 
 
@@ -687,27 +677,6 @@ def delete_question(question_id):
 
 
 
-# Show QR code for payment
-@app.route('/user/payment')
-def user_payment():
-    if 'user_id' not in session:
-        return redirect('/user/login')
-    qr_image = url_for('static', filename='images/qr.jpeg')  # Your QR code image
-    return render_template('qr_payment.html', qr_image=qr_image)
-
-
-
-
-# Mark payment as done
-@app.route('/user/payment_done')
-def payment_done():
-    if 'user_id' not in session:
-        return redirect('/user/login')
-    user = User.query.get(session['user_id'])
-    user.has_paid = True
-    db.session.commit()
-    session['has_paid'] = True
-    return redirect('/user/dashboard')
 
 
 
