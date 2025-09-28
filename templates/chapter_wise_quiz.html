@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
   <title>USER DASHBOARD</title>
@@ -54,14 +54,71 @@
   </div>
   <a href="/user/dashboard" button class="btn btn-danger">Back To Dashboard</a>
 </body>
+</html>-->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>USER DASHBOARD</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body class="bg-light">
+
+  <!-- Header -->
+  <header class="bg-dark text-white p-3">
+    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
+      
+      <h2 class="mb-2 mb-md-0">WELCOME , <u style="color:deeppink;">{{ session['username'] }}</u></h2>
+
+      <form class="d-flex mb-2 mb-md-0" method="GET" action="/chapter/wise/quiz/{{ quiz.id }}" style="flex:1; max-width:400px;">
+        <input class="form-control me-2" type="search" name="q" value="{{ search_query or '' }}" placeholder="Search chapter...">
+        <button class="btn btn-outline-light" type="submit">Search</button>
+      </form>
+
+      <nav class="mt-2 mt-md-0">
+        <a href="/" class="text-white me-2">Home</a>
+        <a href="/about" class="text-white me-2">About</a>
+        <a href="/contact" class="text-white">Contact</a>
+        <a href="/user/profile" button class="btn btn-info btn-sm">MY PROFILE</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Page Title -->
+  <div class="text-center my-4">
+    <h2 class="text-primary"><u>WELCOME TO QUIZ MASTER APP</u></h2>
+    <h3 class="text-secondary"><u>USER DASHBOARD</u></h3>
+  </div>
+
+  <!-- Chapter-wise Quizzes -->
+  <div class="container p-4">
+    <h3 class="mb-4 text-info"><u>CHAPTER-WISE QUIZZES :</u></h3>
+    <div class="row">
+      {% for chapter in chapters %}
+      <div class="col-12 col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 border-info shadow-sm">
+          <div class="card-body text-center">
+            <h5 class="card-title text-info">{{ chapter.title }}</h5>
+            <p class="card-text text-muted">Part of: <strong>{{ chapter.quiz.title }}</strong></p>
+            <a href="/take/quiz/{{ chapter.quiz.id }}/{{ chapter.id }}" class="btn btn-primary btn-sm">I'm Ready to Begin</a>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="col-12 text-center">
+        <h4 class="text-danger mt-4">SORRY, NO QUIZZES AVAILABLE FOR THIS CHAPTER!!!</h4>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Back Button -->
+  <div class="text-center mb-5">
+    <a href="/user/dashboard" class="btn btn-danger">Back To Dashboard</a>
+  </div>
+
+</body>
 </html>
-
-
-
-
-
-
-
-
-
- 

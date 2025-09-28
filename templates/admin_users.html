@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <title>ADMIN - USERS ATTEMPTS</title>
@@ -41,26 +41,62 @@
       <a href="/admin/dashboard" class="btn btn-primary mt-3">BACK TO DASHBOARD</a>
     </div>
 </body>
+</html> -->
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Admin - Users Attempts</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-4">
+
+    <div class="container">
+        <h2 class="text-center mb-4 text-primary"><u>User Quiz Attempts</u></h2>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped text-center align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>DOB</th>
+                        <th>Password</th>
+                        <th>Quiz</th>
+                        <th>Chapter</th>
+                        <th>Score</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for attempt in attempts_data %}
+                    <tr>
+                        <td>{{ attempt.username }}</td>
+                        <td>{{ attempt.fullname }}</td>
+                        <td>{{ attempt.dob }}</td>
+                        <td>{{ attempt.password }}</td>
+                        <td>{{ attempt.quiz_title }}</td>
+                        <td>{{ attempt.chapter_title }}</td>
+                        <td>{{ attempt.score }}</td>
+                        <td>{{ attempt.date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-center mt-3">
+            <a href="/admin/dashboard" class="btn btn-primary">Back to Dashboard</a>
+        </div>
+    </div>
+
+</body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

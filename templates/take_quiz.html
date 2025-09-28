@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <title>TAKE QUIZ</title>
@@ -84,7 +84,7 @@
     </div>
 </div>
 </body>
-</html> 
+</html> -->
 
 
 
@@ -92,8 +92,79 @@
 
 
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Take Quiz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background: #f7f9fc;
+        }
+        .question-card {
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            background: #ffffff;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .question-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .question-number {
+            background: #007bff;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .option-label {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="text-center mt-4">
+    <h2><u style="color:cornflowerblue;">QUIZ: {{ quiz.title }}</u></h2>
+    <h3><u style="color:cadetblue;">CHAPTER: {{ chapter.title }}</u></h3>
+</div>
 
+<div class="container p-4">
+    <form method="POST">
+        {% for question in questions %}
+        <div class="question-card">
+            <h5>
+                <span class="question-number">{{ loop.index }}</span>
+                {{ question.question_statement }}
+            </h5>
 
+            {% if question.question_image %}
+                <img src="{{ url_for('static', filename='uploads/' + question.question_image) }}" width="250" class="mb-2">
+            {% endif %}
 
+            {% for i in range(1, 5) %}
+            <div class="form-check mt-2">
+                <input class="form-check-input" type="radio" name="q{{ question.id }}" id="q{{ question.id }}_{{ i }}" value="{{ i }}">
+                <label class="form-check-label option-label" for="q{{ question.id }}_{{ i }}">
+                    {{ question['option_' ~ i] }}
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
 
+        <div class="text-center">
+            <button type="submit" class="btn btn-success">Submit Quiz</button>
+        </div>
+    </form>
 
+    <div class="text-center mt-4">
+        <a href="/user/dashboard" class="btn btn-danger">Back to Dashboard</a>
+    </div>
+</div>
+</body>
+</html>

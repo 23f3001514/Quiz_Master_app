@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
   <title>About Me - Quiz Master</title>
@@ -7,7 +7,7 @@
 </head>
 <body class="bg-light">
 
-  <!-- Header -->
+  
   <header class="bg-dark text-white p-3">
     <div class="container d-flex justify-content-between align-items-center">
       <h2>Quiz Master</h2>
@@ -20,7 +20,7 @@
     </div>
   </header>
 
-  <!-- About Section -->
+  
   <div class="container mt-5">
     <h1 class="text-primary text-center">About Me</h1>
     <p class="mt-4 fs-5 text-center">
@@ -45,5 +45,71 @@
       <a href="/user/dashboard" button class="btn btn-danger">BACK TO DASHBOARD</a>
     </div>
   </div>
+</body>
+</html> -->
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Me - Quiz Master</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+  <!-- Responsive Header -->
+  <header class="bg-dark text-white">
+    <div class="container">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center py-3">
+        <h2 class="mb-2 mb-md-0">Quiz Master</h2>
+
+        <!-- simple responsive nav: collapses naturally because elements will wrap on small screens -->
+        <nav class="d-flex flex-wrap gap-2 align-items-center">
+          <a href="/" class="text-white text-decoration-none">Home</a>
+          <span class="text-white d-none d-md-inline">|</span>
+          <a href="/about" class="text-white text-decoration-none">About</a>
+          <span class="text-white d-none d-md-inline">|</span>
+          <a href="/contact" class="text-white text-decoration-none">Contact</a>
+          <a href="/user/profile" class="btn btn-info btn-sm ms-2">MY PROFILE</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="container my-4">
+    <h1 class="text-primary text-center">About Me</h1>
+
+    <p class="mt-3 fs-5 text-center mx-auto" style="max-width:800px;">
+      Hi, I’m <strong>ROHAN</strong> 👋<br>
+      Welcome to my Quiz Master App! I built this project to help students practice quizzes chapter-wise and track their performance.
+    </p>
+
+    <div class="row justify-content-center mt-4">
+      <div class="col-12 col-md-8 col-lg-6">
+        <div class="card shadow p-4">
+          <h4 class="text-center text-success">My Interests</h4>
+          <ul class="list-group list-group-flush mt-3">
+            <li class="list-group-item">📘 Learning and Sharing Knowledge</li>
+            <li class="list-group-item">💻 Coding and Web Development</li>
+            <li class="list-group-item">🎯 Solving Puzzles and Quizzes</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-4">
+      <!-- full width on small screens, auto width on md+ -->
+      <a href="/user/dashboard" class="btn btn-danger w-100 w-md-auto">BACK TO DASHBOARD</a>
+    </div>
+  </main>
+
+  <!-- Optional: Bootstrap JS (useful if you later add interactive components) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
