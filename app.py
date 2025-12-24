@@ -1,9 +1,13 @@
+# =============== IMPORTING REQUIRED LIBRARIES ===================
+
 from flask import Flask , render_template , redirect , session , request , url_for
 from flask_sqlalchemy import SQLAlchemy
 import json
 from datetime import datetime
 import os
 from werkzeug.utils import secure_filename
+
+# =================== DONE =======================================
 
 
 app = Flask(__name__)
@@ -94,15 +98,12 @@ class QuizAttempt(db.Model):
 
 
 
+# ===================== MODELS COMPLETED =================================
 
 
 
 
-
-
-
-
-
+# ===================== ROUTES (URL) CODE ================================
 
 @app.route('/')
 def home():
@@ -111,6 +112,8 @@ def home():
 
 
 
+
+# ================= USER REGISTER =====================================
 
 @app.route('/user/register' , methods = ['GET' , 'POST'])
 def user_register():
@@ -133,6 +136,13 @@ def user_register():
     return render_template('user_register.html')
 
 
+# ====================== END ===================================
+
+
+
+
+# ====================== USER LOGIN =============================
+
 
 
 
@@ -154,7 +164,12 @@ def user_login():
     return render_template('user_login.html')
 
 
+# ========================== END ========================================
 
+
+
+
+# ===================== FORGOT PASSWORD ============================
 
 
 @app.route('/user/forgot_password', methods=['GET', 'POST'])
@@ -170,6 +185,12 @@ def forgot_password():
         else:
             return render_template('forgot_password.html', error="Invalid details!")
     return render_template('forgot_password.html')
+
+
+# ============================ END =================================
+
+
+# ================== RESET PASSWORD ==========================
 
 
 @app.route('/user/reset_password', methods=['GET', 'POST'])
@@ -190,7 +211,12 @@ def reset_password():
     return render_template('reset_password.html')
 
 
+# ======================== END ========================================
 
+
+
+
+# ========================== ADMIN LOGIN =====================================
 
 
 @app.route('/admin/login' , methods=['GET' , 'POST'])
@@ -209,9 +235,12 @@ def admin_login():
     return render_template('admin_login.html')
 
 
+# =============================== END =======================================
 
 
 
+
+# =========================== ADMIN DASHBOARD ===============================
 @app.route('/admin/dashboard')
 def admin_dashboard():
     
@@ -232,9 +261,11 @@ def admin_dashboard():
 
     return render_template('admin_dashboard.html' , quizzes=quizzes , chapters=chapters , questions=questions, search_query=search_query)
 
+# ====================================== END ====================================
 
 
 
+# =================== BASIC INFO ====================
 @app.route('/about')
 def about():
     return render_template('about.html')
@@ -243,9 +274,11 @@ def about():
 def contact():
     return render_template('contact.html')
 
+# ============= END ===================
 
 
 
+# ===============  USER PROFILE  ======================
 @app.route('/user/profile/')
 def user_profile():
     if 'user_id' not in session:
@@ -258,8 +291,12 @@ def user_profile():
     
     return render_template('user_profile.html' , user=user)
 
+# ==================  END  ========================
 
 
+
+
+# ==================  USERS LIST  ===========================
 @app.route('/admin/users')
 def admin_users():
     if 'admin_id' not in session:
@@ -299,9 +336,13 @@ def admin_users():
     return render_template('admin_users.html', attempts_data=all_attempts_data)
 
 
+# ============================  END  =======================================
 
 
 
+
+
+#  ======================  ADD QUIZ  ===============================
 
 
 @app.route('/add/quiz' , methods = ['GET' , 'POST'])
@@ -319,7 +360,13 @@ def add_quiz():
     return render_template('add_quiz.html')
 
 
+#  ================  END  ===========================
 
+
+
+
+
+# =============== ADD CHAPTER  ==================================
 
 
 @app.route('/add/chapter/<int:quiz_id>' , methods = ['GET' , 'POST'])
@@ -338,10 +385,16 @@ def add_chapter(quiz_id):
         return redirect('/admin/dashboard')
     return render_template('add_chapter.html' , quiz=quiz)
 
+# ======================  END  ==================================
 
 
 
 
+
+
+
+
+#  ======================  ADD QUESTION  =============================
 
 
 @app.route('/add/question/<int:quiz_id>/<int:chapter_id>', methods=['GET', 'POST'])
@@ -384,10 +437,15 @@ def add_question(quiz_id, chapter_id):
 
     return render_template('add_question.html', quiz=quiz, chapter=chapter)
 
-        
+
+#  =========================  END =================================
 
 
 
+
+
+
+# ===================== EDIT QUESTION ==================================
 
 
 @app.route("/edit/question/<int:question_id>", methods=["GET", "POST"])
@@ -426,9 +484,12 @@ def edit_question(question_id):
     return render_template("edit_question.html", question=question)
 
 
+#  =======================  END  ==============================
 
 
 
+
+#  ======================  USER DASHBOARD ========================
 
 @app.route('/user/dashboard', methods=['GET', 'POST'])
 def user_dashboard():
@@ -459,9 +520,12 @@ def user_dashboard():
     )
 
 
+#  ========================  END  ===========================
 
 
 
+
+# ================= ANSWER KEY ========================
 
 @app.route('/user/answer_key/<int:attempt_id>')
 def answer_key(attempt_id):
@@ -509,9 +573,13 @@ def answer_key(attempt_id):
         attempt=attempt
     )
 
+#  =========================  END =================================
 
 
 
+
+
+# =======================  CHAPTER-WISE-QUIZ ==================================
 
 @app.route('/chapter/wise/quiz/<int:quiz_id>/', methods=['GET'])
 def chapter_wise_quiz(quiz_id):
@@ -536,9 +604,12 @@ def chapter_wise_quiz(quiz_id):
     return render_template('chapter_wise_quiz.html', quiz=quiz, chapters=chapters, search_query=search_query)
 
 
+#  =========================  END ==========================
 
 
 
+
+# ===========================  TAKE QUIZ ==============================
 
 @app.route('/take/quiz/<int:quiz_id>/<int:chapter_id>', methods=['GET', 'POST'])
 def take_quiz(quiz_id, chapter_id):
@@ -546,16 +617,30 @@ def take_quiz(quiz_id, chapter_id):
         return redirect('/user/login')
 
     chapter = Chapter.query.get_or_404(chapter_id)
-    questions = Question.query.filter_by(chapter_id=chapter.id).all()
     quiz = Quiz.query.get_or_404(quiz_id)
+    questions_query = Question.query.filter_by(chapter_id=chapter.id).all()
+
+    # Convert Question objects into dictionaries with INDIVIDUAL option keys
+    questions = []
+    for q in questions_query:
+        questions.append({
+            "id": q.id,
+            "question_statement": q.question_statement,
+            "question_image": q.question_image,
+            "option_1": q.option_1,  # ← Add these individual keys
+            "option_2": q.option_2,
+            "option_3": q.option_3,
+            "option_4": q.option_4,
+            "correct_option": q.correct_option
+        })
 
     if request.method == "POST":
         score = 0
         user_answers = {}
         for question in questions:
-            ans = request.form.get(f'q{question.id}')
-            user_answers[str(question.id)] = int(ans) if ans else None
-            if ans and int(ans) == question.correct_option:
+            ans = request.form.get(f'q{question["id"]}')
+            user_answers[str(question["id"])] = int(ans) if ans else None
+            if ans and int(ans) == question["correct_option"]:
                 score += 1
 
         new_attempt = QuizAttempt(
@@ -568,57 +653,26 @@ def take_quiz(quiz_id, chapter_id):
         db.session.add(new_attempt)
         db.session.commit()
 
-        return render_template('quiz_result.html', score=score, total=len(questions),
-                               quiz_id=quiz.id, attempt_id=new_attempt.id)
+        return render_template('quiz_result.html',
+                               score=score,
+                               total=len(questions),
+                               quiz_id=quiz.id,
+                               attempt_id=new_attempt.id)
 
-    return render_template('take_quiz.html', quiz=quiz, chapter=chapter, questions=questions)
+    return render_template('take_quiz.html',
+                           quiz=quiz,
+                           chapter=chapter,
+                           questions=questions,
+                           time_limit=len(questions) * 60)  # 1 minute per question
 
 
 
-
-
-
-
-
-
-# @app.route('/take/quiz/<int:quiz_id>/<int:chapter_id>', methods=['GET','POST'])
-# def take_quiz(quiz_id, chapter_id):
-#     if 'user_id' not in session:
-#         return redirect('/user/login')
-
-#     user = User.query.get(session['user_id'])
-#     if not user.has_paid:   # <- BLOCK IF NOT PAID
-#         return redirect(url_for('user_payment'))
-
-#     chapter = Chapter.query.get_or_404(chapter_id)
-#     quiz = Quiz.query.get_or_404(quiz_id)
-#     questions = Question.query.filter_by(chapter_id=chapter.id).all()
-
-#     if request.method == "POST":
-#         score = 0
-#         user_answers = {}
-#         for question in questions:
-#             ans = request.form.get(f'q{question.id}')
-#             user_answers[str(question.id)] = int(ans) if ans else None
-#             if ans and int(ans) == question.correct_option:
-#                 score += 1
-
-#         new_attempt = QuizAttempt(
-#             user_id=user.id,
-#             quiz_id=quiz.id,
-#             chapter_id=chapter.id,
-#             score=score,
-#             answers=json.dumps(user_answers)
-#         )
-#         db.session.add(new_attempt)
-#         db.session.commit()
-#         return render_template('quiz_result.html', score=score, total=len(questions) , quiz_id=quiz.id, attempt_id=new_attempt.id)
-
-#     return render_template('take_quiz.html', quiz=quiz, chapter=chapter, questions=questions)
+# =============================  END  ========================
 
 
 
 
+# ==========================  DELETE QUIZ ==============================
 
 
 
@@ -639,9 +693,12 @@ def delete_quiz(quiz_id):
 
     return redirect('/admin/dashboard')
 
+# ======================  END  =====================
 
 
 
+
+# ============  DELETE CHAPTER , QUESTION =========================
 
 @app.route('/delete/chapter/<int:chapter_id>' , methods=['GET' , 'POST'])
 def delete_chapter(chapter_id):
@@ -673,20 +730,10 @@ def delete_question(question_id):
     return redirect('/admin/dashboard')
 
 
+# =============================== END ====================================
+
+
    
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 if __name__ == '__main__':
     with app.app_context():
@@ -699,8 +746,7 @@ if __name__ == '__main__':
 
 
 
-
-
+# ============================= ******COMPLETED SUCCESSFULLY MISSION ACCOMPLISHED********** ============================
 
 
 

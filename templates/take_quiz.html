@@ -1,170 +1,117 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>TAKE QUIZ</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            background: #f7f9fc;
-        }
-        .question-card {
-            border: 2px solid #007bff;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 25px;
-            background: #ffffff;
-            transition: transform 0.2s;
-        }
-        .question-card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .question-number {
-            background: #007bff;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 50%;
-            font-weight: bold;
-            margin-right: 10px;
-        }
-        .option-label {
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-<div class="text-center mt-4">
-    <h2><u style="color:cornflowerblue;">QUIZ NAME: {{ quiz.title }}</u></h2><br>
-    <h3><u style="color:cadetblue;">CHAPTER: {{ chapter.title }}</u></h3>
-</div>
-
-<div class="container p-4">
-    <form method="POST">
-        {% for question in questions %}
-        <div class="question-card">
-            <h5>
-                <span class="question-number">{{ loop.index }}</span>
-                {{ question.question_statement }}
-            </h5>
-
-            {% if question.question_image %}
-                <img src="{{ url_for('static', filename='uploads/' + question.question_image) }}" width="250" class="mb-2">
-            {% endif %}
-            
-            <div class="form-check mt-2">
-                <input class="form-check-input" type="radio" name="q{{ question.id }}" id="q{{ question.id }}_1" value="1">
-                <label class="form-check-label option-label" for="q{{ question.id }}_1">{{ question.option_1 }}</label>
-            </div>
-            
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="q{{ question.id }}" id="q{{ question.id }}_2" value="2">
-                <label class="form-check-label option-label" for="q{{ question.id }}_2">{{ question.option_2 }}</label>
-            </div>
-            
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="q{{ question.id }}" id="q{{ question.id }}_3" value="3">
-                <label class="form-check-label option-label" for="q{{ question.id }}_3">{{ question.option_3 }}</label>
-            </div>
-            
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="q{{ question.id }}" id="q{{ question.id }}_4" value="4">
-                <label class="form-check-label option-label" for="q{{ question.id }}_4">{{ question.option_4 }}</label>
-            </div>
-        </div>
-        {% endfor %}
-
-        <div class="text-center">
-            <button type="submit" class="btn btn-success">Submit Quiz</button>
-        </div>
-    </form>
-
-    <div class="text-center mt-4">
-        <a href="/user/dashboard" class="btn btn-danger">BACK TO DASHBOARD</a>
-    </div>
-</div>
-</body>
-</html> -->
-
-
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Take Quiz</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
-        body {
-            background: #f7f9fc;
-        }
-        .question-card {
-            border: 2px solid #007bff;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 25px;
-            background: #ffffff;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .question-card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .question-number {
-            background: #007bff;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 50%;
+        .timer-box {
+            font-size: 18px;
             font-weight: bold;
-            margin-right: 10px;
-        }
-        .option-label {
-            cursor: pointer;
+            color: #dc3545;
+            border: 2px solid #dc3545;
+            padding: 8px 14px;
+            border-radius: 8px;
         }
     </style>
 </head>
-<body>
-<div class="text-center mt-4">
-    <h2><u style="color:cornflowerblue;">QUIZ: {{ quiz.title }}</u></h2>
-    <h3><u style="color:cadetblue;">CHAPTER: {{ chapter.title }}</u></h3>
-</div>
 
-<div class="container p-4">
-    <form method="POST">
-        {% for question in questions %}
-        <div class="question-card">
-            <h5>
-                <span class="question-number">{{ loop.index }}</span>
-                {{ question.question_statement }}
-            </h5>
+<body class="bg-light">
 
-            {% if question.question_image %}
-                <img src="{{ url_for('static', filename='uploads/' + question.question_image) }}" width="250" class="mb-2">
-            {% endif %}
+<div class="container mt-4">
 
-            {% for i in range(1, 5) %}
-            <div class="form-check mt-2">
-                <input class="form-check-input" type="radio" name="q{{ question.id }}" id="q{{ question.id }}_{{ i }}" value="{{ i }}">
-                <label class="form-check-label option-label" for="q{{ question.id }}_{{ i }}">
-                    {{ question['option_' ~ i] }}
-                </label>
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="text-primary">{{ quiz.title }} – {{ chapter.title }}</h4>
+        <div class="timer-box">
+            Time Left: <span id="timer">00:00</span>
+        </div>
+    </div>
+
+    <!-- Quiz Form -->
+    <form id="quizForm" method="POST">
+
+        {% if questions|length == 0 %}
+            <div class="alert alert-danger text-center">
+                No questions available.
+            </div>
+        {% else %}
+            {% for question in questions %}
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+
+                    <h5>
+                        Q{{ loop.index }}. {{ question.question_statement }}
+                    </h5>
+
+                    {% if question.question_image %}
+                        <img src="{{ url_for('static', filename='uploads/' ~ question.question_image) }}"
+                             class="img-fluid mb-2">
+                    {% endif %}
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio"
+                               name="q{{ question.id }}" value="1" id="q{{ question.id }}_1">
+                        <label class="form-check-label" for="q{{ question.id }}_1">{{ question.option_1 }}</label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio"
+                               name="q{{ question.id }}" value="2" id="q{{ question.id }}_2">
+                        <label class="form-check-label" for="q{{ question.id }}_2">{{ question.option_2 }}</label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio"
+                               name="q{{ question.id }}" value="3" id="q{{ question.id }}_3">
+                        <label class="form-check-label" for="q{{ question.id }}_3">{{ question.option_3 }}</label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio"
+                               name="q{{ question.id }}" value="4" id="q{{ question.id }}_4">
+                        <label class="form-check-label" for="q{{ question.id }}_4">{{ question.option_4 }}</label>
+                    </div>
+
+                </div>
             </div>
             {% endfor %}
-        </div>
-        {% endfor %}
 
-        <div class="text-center">
-            <button type="submit" class="btn btn-success">Submit Quiz</button>
-        </div>
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-success btn-lg">
+                    Submit Quiz
+                </button>
+            </div>
+        {% endif %}
+
     </form>
-
-    <div class="text-center mt-4">
-        <a href="/user/dashboard" class="btn btn-danger">Back to Dashboard</a>
-    </div>
 </div>
+
+<!-- TIMER SCRIPT -->
+<script>
+    let timeLeft = {{ time_limit }};
+    const timer = document.getElementById("timer");
+
+    function format(t) {
+        let m = Math.floor(t / 60);
+        let s = t % 60;
+        return `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    timer.innerText = format(timeLeft);
+
+    const interval = setInterval(() => {
+        timeLeft--;
+        timer.innerText = format(timeLeft);
+
+        if (timeLeft <= 0) {
+            clearInterval(interval);
+            alert("Time up! Quiz submitted.");
+            document.getElementById("quizForm").submit();
+        }
+    }, 1000);
+</script>
+
 </body>
 </html>
