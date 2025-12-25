@@ -1,130 +1,140 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>USER PROFILE PAGE</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        /* Smooth gradient animation */
-        body {
-            height: 100vh;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(-45deg, #6a11cb, #2575fc, #ff6a00, #ee0979);
-            background-size: 400% 400%;
-            animation: gradientBG 12s ease infinite;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        #form-body {
-            max-width: 600px;
-            width: 90%;
-        }
-    </style>
-</head>
-<body class="d-flex justify-content-center align-items-center vh-100">
-    <div class="card p-4 shadow" id="form-body">
-        <h2 class="text-center mb-4"><u style="color:#ee0979;">MY PROFILE</u></h2>
-
-        <table class="table table-bordered text-center">
-            <thead class="table-dark">
-                <tr>
-                    <th>USERNAME</th>
-                    <th>FULL NAME</th>
-                    <th>PASSWORD</th>
-                    <th>DOB</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ user.username }}</td>
-                    <td>{{ user.fullname }}</td>
-                    <td>{{ user.password }}</td>
-                    <td>{{ user.dob }}</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div class="text-center mt-3">
-            <a href="/user/dashboard" class="btn btn-info">BACK TO DASHBOARD</a>
-        </div>
-    </div>
-</body>
-</html> -->
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>USER PROFILE PAGE</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>My Profile | Quiz Master</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
     <style>
         body {
-            min-height: 100vh;
-            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #f4f6fb;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: linear-gradient(135deg, #1d2671, #c33764);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: #fff !important;
+        }
+
+        /* PROFILE CARD */
+        .profile-card {
+            border-radius: 18px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .profile-avatar {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
             display: flex;
-            justify-content: center;
             align-items: center;
-            background: linear-gradient(-45deg, #6a11cb, #2575fc, #ff6a00, #ee0979);
-            background-size: 400% 400%;
-            animation: gradientBG 12s ease infinite;
+            justify-content: center;
+            font-size: 42px;
+            color: white;
+            font-weight: 700;
+            margin: auto;
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .info-label {
+            font-weight: 600;
+            color: #6c757d;
         }
 
-        #form-body {
-            width: 100%;
-            max-width: 600px;
-            padding: 20px;
+        .info-value {
+            font-weight: 500;
         }
 
-        table {
-            word-break: break-word;
+        .back-btn {
+            border-radius: 50px;
+            padding: 10px 40px;
+            font-weight: 600;
         }
     </style>
 </head>
+
 <body>
-    <div class="card p-4 shadow" id="form-body">
-        <h2 class="text-center mb-4"><u style="color:#ee0979;">MY PROFILE</u></h2>
 
-        <div class="table-responsive">
-            <table class="table table-bordered text-center">
-                <thead class="table-dark">
-                    <tr>
-                        <th>USERNAME</th>
-                        <th>FULL NAME</th>
-                        <th>PASSWORD</th>
-                        <th>DOB</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>{{ user.username }}</td>
-                        <td>{{ user.fullname }}</td>
-                        <td>{{ user.password }}</td>
-                        <td>{{ user.dob }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark px-3">
+    <a class="navbar-brand" href="/">Quiz Master</a>
 
-        <div class="text-center mt-3">
-            <a href="/user/dashboard" class="btn btn-info w-100">BACK TO DASHBOARD</a>
+    <div class="ms-auto">
+        <span class="badge bg-light text-dark px-3 py-2">
+            {{ user.username }}
+        </span>
+    </div>
+</nav>
+
+<!-- CONTENT -->
+<div class="container my-5">
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="card profile-card p-4 text-center">
+
+                <!-- AVATAR -->
+                <div class="profile-avatar mb-3">
+                    {{ user.username[0]|upper }}
+                </div>
+
+                <h4 class="fw-bold mb-1">{{ user.fullname }}</h4>
+                <p class="text-muted mb-4">@{{ user.username }}</p>
+
+                <!-- PROFILE DETAILS -->
+                <div class="text-start mt-4">
+
+                    <div class="d-flex justify-content-between border-bottom py-2">
+                        <span class="info-label">Username</span>
+                        <span class="info-value">{{ user.username }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between border-bottom py-2">
+                        <span class="info-label">Full Name</span>
+                        <span class="info-value">{{ user.fullname }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between border-bottom py-2">
+                        <span class="info-label">Date of Birth</span>
+                        <span class="info-value">{{ user.dob }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between py-2">
+                        <span class="info-label">Password</span>
+                        <span class="info-value">{{ user.password }}</span>
+                    </div>
+
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="mt-4">
+                    <a href="/user/dashboard" class="btn btn-primary back-btn">
+                        Back to Dashboard
+                    </a>
+                </div>
+
+            </div>
+
         </div>
     </div>
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
+

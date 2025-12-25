@@ -1,145 +1,143 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>USER REGISTER</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        /* Smooth gradient animation */
-        body {
-            height: 100vh;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(-45deg, #6a11cb, #2575fc, #ff6a00, #ee0979);
-            background-size: 400% 400%;
-            animation: gradientBG 12s ease infinite;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        #form-body {
-            max-width: 500px;
-            width: 90%;
-        }
-    </style>
-</head>
-<body class="d-flex justify-content-center align-items-center vh-100">
-    <div class="card p-4 shadow" id="form-body">
-        <h2 class="text-center mb-4"><u>User Registration</u></h2>
-
-        <form method="POST">
-            <div class="mb-3">
-                <label class="form-label"><h5>Username :</h5></label>
-                <input type="text" name="username" class="form-control" placeholder="Enter Your Name" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label"><h5>Password :</h5></label>
-                <input type="password" name="password" class="form-control" placeholder="Enter Your Password" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label"><h5>Full Name :</h5></label>
-                <input type="text" name="fullname" class="form-control" placeholder="Enter Your Full Name" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label"><h5>Date Of Birth :</h5></label>
-                <input type="date" name="dob" class="form-control" required>
-            </div>
-
-            <div class="text-center mt-3">
-                <button type="submit" class="btn btn-primary w-100">REGISTER</button>
-            </div>
-
-            <div class="text-center mt-3">
-                <h5>Already Have an Account? <a href="/user/login">Login Here</a></h5>
-            </div>
-
-            {% if error %}
-            <div class="alert alert-danger mt-3">{{ error }}</div>
-            {% endif %}
-        </form>
-    </div>
-</body>
-</html> -->
-
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>USER REGISTER</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Quiz Master | Create Account</title>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
     <style>
-        /* Smooth gradient animation */
         body {
+            font-family: 'Poppins', sans-serif;
             min-height: 100vh;
-            margin: 0;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
             display: flex;
-            justify-content: center;
             align-items: center;
-            background: linear-gradient(-45deg, #6a11cb, #2575fc, #ff6a00, #ee0979);
-            background-size: 400% 400%;
-            animation: gradientBG 12s ease infinite;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        #form-body {
-            width: 100%;
-            max-width: 400px; /* ideal for mobile */
+            justify-content: center;
             padding: 20px;
+        }
+
+        .register-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 35px 30px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+            color: #fff;
+        }
+
+        .register-card h2 {
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .register-card p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 10px 12px;
+            border: none;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 0.2rem rgba(13,110,253,.25);
+        }
+
+        .btn-register {
+            background-color: #20c997;
+            border: none;
+            padding: 12px;
+            font-weight: 600;
+            border-radius: 10px;
+        }
+
+        .btn-register:hover {
+            background-color: #198754;
+        }
+
+        .login-link a {
+            color: #0d6efd;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 576px) {
+            .register-card {
+                padding: 30px 20px;
+            }
         }
     </style>
 </head>
+
 <body>
-    <div class="container d-flex justify-content-center align-items-center min-vh-100">
-        <div class="card p-4 shadow" id="form-body">
-            <h2 class="text-center mb-4"><u>User Registration</u></h2>
 
-            <form method="POST">
-                <div class="mb-3">
-                    <label class="form-label"><h5>Username :</h5></label>
-                    <input type="text" name="username" class="form-control" placeholder="Enter Your Name" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label"><h5>Password :</h5></label>
-                    <input type="password" name="password" class="form-control" placeholder="Enter Your Password" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label"><h5>Full Name :</h5></label>
-                    <input type="text" name="fullname" class="form-control" placeholder="Enter Your Full Name" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label"><h5>Date Of Birth :</h5></label>
-                    <input type="date" name="dob" class="form-control" required>
-                </div>
+<div class="register-card">
 
-                <div class="d-grid gap-2 mt-3">
-                    <button type="submit" class="btn btn-primary w-100">REGISTER</button>
-                </div>
+    <!-- Title -->
+    <h2 class="text-center">Create Your Account</h2>
+    <p class="text-center mb-4">Join Quiz Master and start learning smarter 🚀</p>
 
-                <div class="text-center mt-3">
-                    <h5>Already Have an Account? <a href="/user/login">Login Here</a></h5>
-                </div>
+    <!-- Form -->
+    <form method="POST">
 
-                {% if error %}
-                <div class="alert alert-danger mt-3">{{ error }}</div>
-                {% endif %}
-            </form>
+        <div class="mb-3">
+            <label>Username</label>
+            <input type="text" name="username" class="form-control" placeholder="Choose a username" required>
         </div>
-    </div>
+
+        <div class="mb-3">
+            <label>Password</label>
+            <input type="password" name="password" class="form-control" placeholder="Create a password" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Full Name</label>
+            <input type="text" name="fullname" class="form-control" placeholder="Enter your full name" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Date of Birth</label>
+            <input type="date" name="dob" class="form-control" required>
+        </div>
+
+        <div class="d-grid mt-4">
+            <button type="submit" class="btn btn-register">Create Account</button>
+        </div>
+
+        <!-- Login Redirect -->
+        <div class="text-center mt-3 login-link">
+            Already have an account? <a href="/user/login">Login here</a>
+        </div>
+
+        <!-- Error -->
+        {% if error %}
+        <div class="alert alert-danger mt-3 text-center">
+            {{ error }}
+        </div>
+        {% endif %}
+
+    </form>
+
+</div>
+
 </body>
 </html>

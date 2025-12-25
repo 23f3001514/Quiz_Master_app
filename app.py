@@ -1,6 +1,7 @@
 # =============== IMPORTING REQUIRED LIBRARIES ===================
 
 from flask import Flask , render_template , redirect , session , request , url_for
+import time 
 from flask_sqlalchemy import SQLAlchemy
 import json
 from datetime import datetime
@@ -522,11 +523,6 @@ def user_dashboard():
 
 #  ========================  END  ===========================
 
-
-
-
-# ================= ANSWER KEY ========================
-
 @app.route('/user/answer_key/<int:attempt_id>')
 def answer_key(attempt_id):
     if 'user_id' not in session:
@@ -534,46 +530,164 @@ def answer_key(attempt_id):
 
     attempt = QuizAttempt.query.get_or_404(attempt_id)
 
-    # security: only the user who made the attempt can view it
     if attempt.user_id != session.get('user_id'):
-        return "Not authorized to view this attempt", 403
+        return "Not authorized", 403
 
-    # load the exact questions for the attempt (prefer chapter if stored)
+    # Load questions
     if attempt.chapter_id:
         questions_query = Question.query.filter_by(chapter_id=attempt.chapter_id).all()
     else:
         questions_query = Question.query.filter_by(quiz_id=attempt.quiz_id).all()
 
-    # Convert each Question model into a plain dict so template doesn't need getattr
-    questions = []
+    # Parse stored answers
+    user_answers = {}
+    if attempt.answers:
+        raw = json.loads(attempt.answers)
+        user_answers = {int(k): v for k, v in raw.items()}
+
+    total = len(questions_query)
+    correct = 0
+    wrong = 0
+    unattempted = 0
+
+    detailed_questions = []
+
     for q in questions_query:
-        questions.append({
-            "id": q.id,
+        selected = user_answers.get(q.id)
+
+        if selected is None:
+            unattempted += 1
+        elif selected == q.correct_option:
+            correct += 1
+        else:
+            wrong += 1
+
+        detailed_questions.append({
             "question_statement": q.question_statement,
             "question_image": q.question_image,
             "options": [q.option_1, q.option_2, q.option_3, q.option_4],
-            "correct_option": q.correct_option
+            "correct_option": q.correct_option,
+            "selected": selected
         })
 
-    # Parse stored answers JSON (keys in JSON are strings). Convert keys to ints for easy lookup.
-    user_answers = {}
-    if attempt.answers:
-        try:
-            raw = json.loads(attempt.answers)
-            # convert keys to int -> value should be an int or None
-            user_answers = {int(k): (int(v) if v is not None else None) for k, v in raw.items()}
-        except Exception:
-            user_answers = {}
+    # ---------------------------
+    # ACCURACY CALCULATION
+    # ---------------------------
+    accuracy = round((correct / total) * 100, 2) if total else 0
 
+    # ---------------------------
+    # PERFORMANCE MESSAGE LOGIC  ✅ NEW PART
+    # ---------------------------
+    if accuracy < 30:
+        performance_msg = "Very Poor 😟 – You need serious improvement in this chapter."
+        performance_class = "danger"
+    elif accuracy < 50:
+        performance_msg = "Poor 😐 – Focus more on this chapter."
+        performance_class = "warning"
+    elif accuracy < 70:
+        performance_msg = "Average 🙂 – You can do better with practice."
+        performance_class = "secondary"
+    elif accuracy < 80:
+        performance_msg = "Good 👍 – Keep improving!"
+        performance_class = "info"
+    elif accuracy < 90:
+        performance_msg = "Excellent 🌟 – Strong understanding!"
+        performance_class = "success"
+    else:
+        performance_msg = "Outstanding 🔥 – You have mastered this topic!"
+        performance_class = "success"
+
+    # ---------------------------
+    # RENDER TEMPLATE
+    # ---------------------------
     return render_template(
-        'answer_key.html',
+        'quiz_analysis.html',
         quiz=attempt.quiz,
-        questions=questions,
+        chapter=attempt.chapter,
+        total=total,
+        correct=correct,
+        wrong=wrong,
+        unattempted=unattempted,
+        accuracy=accuracy,
+        questions=detailed_questions,
         user_answers=user_answers,
-        attempt=attempt
+        attempt=attempt,
+        performance_msg=performance_msg,
+        performance_class=performance_class
     )
 
-#  =========================  END =================================
+
+
+# ====================================== END ================================================
+
+
+# ---------------------------------------------------------- don't delete below code ------------------
+
+# @app.route('/user/answer_key/<int:attempt_id>')
+# def answer_key(attempt_id):
+#     if 'user_id' not in session:
+#         return redirect('/user/login')
+
+#     attempt = QuizAttempt.query.get_or_404(attempt_id)
+
+#     if attempt.user_id != session.get('user_id'):
+#         return "Not authorized", 403
+
+#     # Load questions
+#     if attempt.chapter_id:
+#         questions_query = Question.query.filter_by(chapter_id=attempt.chapter_id).all()
+#     else:
+#         questions_query = Question.query.filter_by(quiz_id=attempt.quiz_id).all()
+
+#     # Parse answers
+#     user_answers = {}
+#     if attempt.answers:
+#         raw = json.loads(attempt.answers)
+#         user_answers = {int(k): v for k, v in raw.items()}
+
+#     total = len(questions_query)
+#     correct = 0
+#     wrong = 0
+#     unattempted = 0
+
+#     detailed_questions = []
+
+#     for q in questions_query:
+#         selected = user_answers.get(q.id)
+
+#         if selected is None:
+#             unattempted += 1
+#         elif selected == q.correct_option:
+#             correct += 1
+#         else:
+#             wrong += 1
+
+#         detailed_questions.append({
+#             "question_statement": q.question_statement,
+#             "question_image": q.question_image,
+#             "options": [q.option_1, q.option_2, q.option_3, q.option_4],
+#             "correct_option": q.correct_option,
+#             "selected": selected
+#         })
+
+#     accuracy = round((correct / total) * 100, 2) if total else 0
+
+#     return render_template(
+#         'quiz_analysis.html',
+#         quiz=attempt.quiz,
+#         chapter=attempt.chapter,
+#         total=total,
+#         correct=correct,
+#         wrong=wrong,
+#         unattempted=unattempted,
+#         accuracy=accuracy,
+#         questions=detailed_questions,
+#         user_answers=user_answers,
+#         attempt=attempt  # important: must pass this
+#     )
+
+
+# ------------------- yes don't delete above code ---------------------------------
 
 
 
@@ -609,38 +723,50 @@ def chapter_wise_quiz(quiz_id):
 
 
 
+
 # ===========================  TAKE QUIZ ==============================
+
+
 
 @app.route('/take/quiz/<int:quiz_id>/<int:chapter_id>', methods=['GET', 'POST'])
 def take_quiz(quiz_id, chapter_id):
     if 'user_id' not in session:
         return redirect('/user/login')
 
-    chapter = Chapter.query.get_or_404(chapter_id)
     quiz = Quiz.query.get_or_404(quiz_id)
+    chapter = Chapter.query.get_or_404(chapter_id)
+
     questions_query = Question.query.filter_by(chapter_id=chapter.id).all()
 
-    # Convert Question objects into dictionaries with INDIVIDUAL option keys
+    # Convert Question objects to dict
     questions = []
     for q in questions_query:
         questions.append({
             "id": q.id,
             "question_statement": q.question_statement,
             "question_image": q.question_image,
-            "option_1": q.option_1,  # ← Add these individual keys
+            "option_1": q.option_1,
             "option_2": q.option_2,
             "option_3": q.option_3,
             "option_4": q.option_4,
             "correct_option": q.correct_option
         })
 
+    # 🔑 Unique timer key per quiz + chapter
+    session_key = f"quiz_end_{quiz.id}_{chapter.id}"
+
+    # ⏱ 1 minute per question
+    total_seconds = len(questions) * 60
+
+    # ====================== SUBMIT QUIZ ======================
     if request.method == "POST":
         score = 0
         user_answers = {}
-        for question in questions:
-            ans = request.form.get(f'q{question["id"]}')
-            user_answers[str(question["id"])] = int(ans) if ans else None
-            if ans and int(ans) == question["correct_option"]:
+
+        for q in questions:
+            ans = request.form.get(f'q{q["id"]}')
+            user_answers[str(q["id"])] = int(ans) if ans else None
+            if ans and int(ans) == q["correct_option"]:
                 score += 1
 
         new_attempt = QuizAttempt(
@@ -653,17 +779,29 @@ def take_quiz(quiz_id, chapter_id):
         db.session.add(new_attempt)
         db.session.commit()
 
-        return render_template('quiz_result.html',
-                               score=score,
-                               total=len(questions),
-                               quiz_id=quiz.id,
-                               attempt_id=new_attempt.id)
+        # ✅ CLEAR TIMER AFTER SUBMIT
+        session.pop(session_key, None)
 
-    return render_template('take_quiz.html',
-                           quiz=quiz,
-                           chapter=chapter,
-                           questions=questions,
-                           time_limit=len(questions) * 60)  # 1 minute per question
+        return render_template(
+            'quiz_result.html',
+            score=score,
+            total=len(questions),
+            quiz_id=quiz.id,
+            attempt_id=new_attempt.id
+        )
+
+    # ====================== START / CONTINUE QUIZ ======================
+    if session_key not in session:
+        # 🔥 IMPORTANT FIX (NO UTC / TIMEZONE ISSUE)
+        session[session_key] = int(time.time()) + total_seconds
+
+    return render_template(
+        'take_quiz.html',
+        quiz=quiz,
+        chapter=chapter,
+        questions=questions,
+        quiz_end_time=session[session_key]
+    )
 
 
 
@@ -730,10 +868,45 @@ def delete_question(question_id):
     return redirect('/admin/dashboard')
 
 
-# =============================== END ====================================
 
 
-   
+
+# ========================== END ================================
+
+
+
+
+# ======================== USER LEADERBOARD ===============================
+
+@app.route('/leaderboard/<int:quiz_id>')
+def leaderboard(quiz_id):
+    if 'user_id' not in session:
+        return redirect('/user/login')
+
+    quiz = Quiz.query.get_or_404(quiz_id)
+
+    # Fetch top 10 attempts (highest score first, earlier attempt wins tie)
+    top_attempts = QuizAttempt.query.filter_by(quiz_id=quiz_id).order_by(
+        QuizAttempt.score.desc(),
+        QuizAttempt.timestamp.asc()
+    ).limit(10).all()
+
+    # 🔥 IMPORTANT: pass current user id
+    current_user_id = session.get('user_id')
+
+    return render_template(
+        'leaderboard.html',
+        quiz=quiz,
+        top_attempts=top_attempts,
+        current_user_id=current_user_id   # 👈 THIS ENABLES GLOW + YOU BADGE
+    )
+
+
+
+# ============================= END ===============================
+
+
+
 
 if __name__ == '__main__':
     with app.app_context():

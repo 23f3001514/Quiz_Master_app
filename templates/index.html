@@ -1,56 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>HOME PAGE</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Quiz Master | Learn • Practice • Improve</title>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
     <style>
-        /* Smooth gradient animation */
         body {
+            font-family: 'Poppins', sans-serif;
             min-height: 100vh;
-            margin: 0;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+        }
+
+        .hero {
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            background: linear-gradient(-45deg, #6a11cb, #2575fc, #ff6a00, #ee0979);
-            background-size: 400% 400%;
-            animation: gradientBG 12s ease infinite;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        #form-body {
-            width: 100%;
-            max-width: 400px; /* reduced for mobile */
             padding: 20px;
         }
 
-        .btn-spacing > * {
-            margin: 5px 0; /* vertical spacing for mobile */
-            width: 100%; /* full-width buttons on mobile */
+        .hero-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 40px 30px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
         }
 
-        h2, h3 {
-            word-break: break-word; /* prevent overflow */
+        .brand {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .tagline {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .feature-list li {
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .btn-main {
+            padding: 12px;
+            font-weight: 600;
+            border-radius: 10px;
+        }
+
+        .btn-user {
+            background-color: #0d6efd;
+            border: none;
+        }
+
+        .btn-user:hover {
+            background-color: #0b5ed7;
+        }
+
+        .btn-register {
+            background-color: #20c997;
+            border: none;
+        }
+
+        .btn-register:hover {
+            background-color: #198754;
+        }
+
+        .btn-admin {
+            background-color: transparent;
+            border: 1px solid #ffc107;
+            color: #ffc107;
+        }
+
+        .btn-admin:hover {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        footer {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 576px) {
+            .brand {
+                font-size: 1.6rem;
+            }
         }
     </style>
 </head>
+
 <body>
-    <div class="container d-flex justify-content-center align-items-center min-vh-100">
-        <div class="card p-4 shadow text-center" id="form-body">
-            <h2 class="mb-3"><u>WELCOME TO THE QUIZ MASTER</u></h2>
-            <h3 class="mb-4"><u>HOME PAGE</u></h3>
-            <p class="mb-4"><strong>If You're a New User, please Register First.</strong></p>
-            <div class="btn-spacing d-grid gap-2">
-                <a href="/user/register" class="btn btn-secondary">USER REGISTER</a>
-                <a href="/user/login" class="btn btn-primary">USER LOGIN</a>
-                <a href="/admin/login" class="btn btn-warning">ADMIN LOGIN</a>
+
+<div class="hero">
+    <div class="container d-flex justify-content-center">
+        <div class="hero-card text-center">
+
+            <!-- Branding -->
+            <h1 class="brand mb-2">Quiz Master</h1>
+            <p class="tagline mb-4">Learn smarter • Test faster • Improve daily</p>
+
+            <!-- Features -->
+            <ul class="feature-list text-start mb-4">
+                <li>✅ Register first if you're a new user</li>
+                <li>✔ Chapter-wise quizzes</li>
+                <li>✔ Instant result & accuracy analysis</li>
+                <li>✔ Leaderboard & performance tracking</li>
+                <li>✔ Designed for students & learners</li>
+            </ul>
+
+            <!-- Actions -->
+            <div class="d-grid gap-3">
+                <a href="/user/login" class="btn btn-main btn-user">Login as User</a>
+                <a href="/user/register" class="btn btn-main btn-register">Create New Account</a>
+                <a href="/admin/login" class="btn btn-main btn-admin">Admin Access</a>
             </div>
+
+            <!-- Footer -->
+            <footer class="mt-4">
+                © {{ 2025 }} Quiz Master • Built for Learning
+            </footer>
+
         </div>
     </div>
+</div>
+
 </body>
 </html>
