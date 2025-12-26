@@ -1576,17 +1576,6 @@ def debug_db():
     return json.dumps(data, indent=4)
 
 # ---------------- MAIN ----------------
-# if __name__ == '__main__':
-#     with app.app_context():
-#         db.create_all()
-#         if not Admin.query.first():
-#             default_admin = Admin(username='admin', password='admin123')
-#             db.session.add(default_admin)
-#             db.session.commit()
-#     app.run(debug=True)
-
-
-
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
@@ -1594,6 +1583,6 @@ if __name__ == '__main__':
             default_admin = Admin(username='admin', password='admin123')
             db.session.add(default_admin)
             db.session.commit()
+    app.run(debug=True)
 
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=True)
+
