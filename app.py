@@ -925,9 +925,6 @@
 
 
 
-
-
-
 # =============== IMPORTING REQUIRED LIBRARIES ===================
 
 from flask import Flask , render_template , redirect , session , request , url_for
@@ -945,9 +942,16 @@ app = Flask(__name__)
 # -------------------- SECRET KEY -----------------------------
 app.secret_key = 'secret_key_for_session'
 
-# -------------------- SQLITE PERSISTENT DB -------------------
-db_path = os.path.join(os.getcwd(), 'quiz.db')
-app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+# -------------------- DATABASE CONFIGURATION (FIXED!) -------------------
+# Get database URL from environment variable (Render sets this automatically)
+database_url = os.environ.get('DATABASE_URL')
+
+# Fix for SQLAlchemy (Render uses 'postgres://' but SQLAlchemy needs 'postgresql://')
+if database_url and database_url.startswith('postgres://'):
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+
+# Use PostgreSQL in production, SQLite for local development
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url or "sqlite:///quiz.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -956,6 +960,9 @@ db = SQLAlchemy(app)
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Create upload folder if it doesn't exist
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -1130,12 +1137,7 @@ def about():
 def contact():
     return render_template('contact.html')
 
-
-
-
-
-
-
+# ---------------- USER DASHBOARD ----------------
 @app.route('/user/dashboard', methods=['GET', 'POST'])
 def user_dashboard():
     if 'user_id' not in session:
@@ -1157,23 +1159,14 @@ def user_dashboard():
 
     return render_template(
         'user_dashboard.html', 
-        username=session.get('username'),   # fixed here (you used user_username before)
+        username=session.get('username'),
         quizzes=quizzes, 
         chapters=chapters, 
         search_query=search_query,
         attempts=attempts
     )
 
-
-
-
-
-
-
-
-
-
-
+# ---------------- CHAPTER WISE QUIZ ----------------
 @app.route('/chapter/wise/quiz/<int:quiz_id>/', methods=['GET'])
 def chapter_wise_quiz(quiz_id):
     if 'user_id' not in session:
@@ -1196,9 +1189,7 @@ def chapter_wise_quiz(quiz_id):
 
     return render_template('chapter_wise_quiz.html', quiz=quiz, chapters=chapters, search_query=search_query)
 
-
-
-
+# ---------------- LEADERBOARD ----------------
 @app.route('/leaderboard/<int:quiz_id>')
 def leaderboard(quiz_id):
     if 'user_id' not in session:
@@ -1219,12 +1210,10 @@ def leaderboard(quiz_id):
         'leaderboard.html',
         quiz=quiz,
         top_attempts=top_attempts,
-        current_user_id=current_user_id   # 👈 THIS ENABLES GLOW + YOU BADGE
+        current_user_id=current_user_id
     )
 
-
-
-
+# ---------------- ANSWER KEY ----------------
 @app.route('/user/answer_key/<int:attempt_id>')
 def answer_key(attempt_id):
     if 'user_id' not in session:
@@ -1272,14 +1261,10 @@ def answer_key(attempt_id):
             "selected": selected
         })
 
-    # ---------------------------
     # ACCURACY CALCULATION
-    # ---------------------------
     accuracy = round((correct / total) * 100, 2) if total else 0
 
-    # ---------------------------
-    # PERFORMANCE MESSAGE LOGIC  ✅ NEW PART
-    # ---------------------------
+    # PERFORMANCE MESSAGE LOGIC
     if accuracy < 30:
         performance_msg = "Very Poor 😟 – You need serious improvement in this chapter."
         performance_class = "danger"
@@ -1299,9 +1284,6 @@ def answer_key(attempt_id):
         performance_msg = "Outstanding 🔥 – You have mastered this topic!"
         performance_class = "success"
 
-    # ---------------------------
-    # RENDER TEMPLATE
-    # ---------------------------
     return render_template(
         'quiz_analysis.html',
         quiz=attempt.quiz,
@@ -1317,11 +1299,6 @@ def answer_key(attempt_id):
         performance_msg=performance_msg,
         performance_class=performance_class
     )
-
-
-
-
-
 
 # ---------------- USER PROFILE ----------------
 @app.route('/user/profile/')
@@ -1508,6 +1485,77 @@ def take_quiz(quiz_id, chapter_id):
         quiz_end_time=session[session_key]
     )
 
+# ---------------- USER LOGOUT ----------------
+@app.route('/user/logout')
+def user_logout():
+    session.clear()
+    return redirect('/')
+
+# ---------------- ADMIN LOGOUT ----------------
+@app.route('/admin/logout')
+def admin_logout():
+    session.clear()
+    return redirect('/')
+
+
+
+
+# ============  DELETE CHAPTER , QUESTION =========================
+
+
+@app.route('/delete/quiz/<int:quiz_id>' , methods = ['GET' , 'POST'])
+def delete_quiz(quiz_id):
+    if 'admin_id' not in session:
+        return redirect('/admin/login')
+    
+    quiz = Quiz.query.get_or_404(quiz_id)
+
+    QuizAttempt.query.filter_by(quiz_id=quiz.id).delete()
+
+    Chapter.query.filter_by(quiz_id=quiz.id).delete()
+    Question.query.filter_by(quiz_id=quiz.id).delete()
+
+    db.session.delete(quiz)
+    db.session.commit()
+
+    return redirect('/admin/dashboard')
+
+
+
+
+@app.route('/delete/chapter/<int:chapter_id>' , methods=['GET' , 'POST'])
+def delete_chapter(chapter_id):
+    if 'admin_id' not in session:
+        return redirect('/admin/login')
+    
+    chapter = Chapter.query.get_or_404(chapter_id)
+    Question.query.filter_by(chapter_id=chapter.id).delete()
+
+    db.session.delete(chapter)
+    db.session.commit()
+
+    return redirect('/admin/dashboard')
+
+
+
+
+
+@app.route('/delete/question/<int:question_id>' , methods = ['GET' , 'POST'])
+def delete_question(question_id):
+    if 'admin_id' not in session:
+        return redirect('/admin/login')
+    
+    question = Question.query.get_or_404(question_id)
+
+    db.session.delete(question)
+    db.session.commit()
+
+    return redirect('/admin/dashboard')
+
+
+
+
+
 
 
 # ===================== DEBUG ROUTE =====================
@@ -1526,8 +1574,6 @@ def debug_db():
     }
 
     return json.dumps(data, indent=4)
-
-
 
 # ---------------- MAIN ----------------
 if __name__ == '__main__':
