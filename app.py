@@ -1213,6 +1213,8 @@ def leaderboard(quiz_id):
         current_user_id=current_user_id
     )
 
+
+
 # ---------------- ANSWER KEY ----------------
 @app.route('/user/answer_key/<int:attempt_id>')
 def answer_key(attempt_id):
@@ -1254,6 +1256,7 @@ def answer_key(attempt_id):
             wrong += 1
 
         detailed_questions.append({
+            "id": q.id,   # ✅ ADD THIS
             "question_statement": q.question_statement,
             "question_image": q.question_image,
             "options": [q.option_1, q.option_2, q.option_3, q.option_4],

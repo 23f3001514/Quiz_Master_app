@@ -7,65 +7,96 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
-    <div class="container py-5">
 
-        <!-- Title -->
-        <h2 class="text-center mb-4 text-primary"><u>{{ quiz.title }} - Answer Key</u></h2>
+<div class="container py-5">
 
-        <!-- Attempt Info -->
-        <div class="card shadow-sm p-3 mb-4">
-            <div class="row">
-                <div class="col-md-6">
-                    <strong>Attempted on:</strong> {{ attempt.timestamp.strftime("%Y-%m-%d %H:%M") }}
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <strong>Score:</strong> 
-                    <span class="badge bg-success">{{ attempt.score }} / {{ questions|length }}</span>
-                </div>
+    <!-- Title -->
+    <h2 class="text-center mb-4 text-primary">
+        <u>{{ quiz.title }} - Answer Key</u>
+    </h2>
+
+    <!-- Attempt Info -->
+    <div class="card shadow-sm p-3 mb-4">
+        <div class="row">
+            <div class="col-md-6">
+                <strong>Attempted on:</strong>
+                {{ attempt.timestamp.strftime("%Y-%m-%d %H:%M") }}
+            </div>
+            <div class="col-md-6 text-md-end">
+                <strong>Score:</strong>
+                <span class="badge bg-success">
+                    {{ attempt.score }} / {{ questions|length }}
+                </span>
             </div>
         </div>
+    </div>
 
-        <!-- Questions and Answers -->
-        {% for question in questions %}
-        <div class="mb-4 border p-3 rounded bg-white shadow-sm">
-            <p><strong>Q{{ loop.index }}:</strong> {{ question.question_statement }}</p>
+    <!-- Performance Summary -->
+    <div class="alert alert-{{ performance_class }} text-center fw-bold">
+        {{ performance_msg }} <br>
+        Accuracy: {{ accuracy }}%
+    </div>
 
-            {% if question.question_image %}
-            <div class="text-center mb-3">
-                <img src="{{ url_for('static', filename='uploads/' + question.question_image) }}" 
-                     class="img-fluid rounded shadow-sm" style="max-width: 350px;">
-            </div>
-            {% endif %}
+    <!-- Questions -->
+    {% for question in questions %}
+    <div class="mb-4 border p-3 rounded bg-white shadow-sm">
 
-            <ul class="list-group">
-                {% set user_sel = user_answers.get(question.id) %}
-                {% for i in range(0, question.options|length) %}
-                    {% set opt_index = i + 1 %}
-                    {% set opt_text = question.options[i] %}
-                    <li class="list-group-item 
-                        {% if opt_index == question.correct_option %} list-group-item-success fw-bold {% endif %}
-                        {% if user_sel is not none and user_sel == opt_index and opt_index != question.correct_option %} list-group-item-danger {% endif %}
-                    ">
-                        {{ opt_index }}) {{ opt_text }}
-                        
-                        {% if opt_index == question.correct_option %}
-                            <span class="ms-2 text-success fw-bold">✔ Correct</span>
-                        {% endif %}
-                        
-                        {% if user_sel is not none and user_sel == opt_index %}
-                            <span class="ms-2 text-primary">← Your Answer</span>
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
+        <!-- Question Text -->
+        <p class="fs-5">
+            <strong>Q{{ loop.index }}:</strong>
+            {{ question.question_statement }}
+        </p>
+
+        <!-- Question Image -->
+        {% if question.question_image %}
+        <div class="text-center mb-3">
+            <img src="{{ url_for('static', filename='uploads/' + question.question_image) }}"
+                 class="img-fluid rounded shadow-sm"
+                 style="max-width: 350px;">
         </div>
-        {% endfor %}
+        {% endif %}
 
-        <!-- Back Button -->
-        <div class="text-center mt-4">
-            <a href="/user/dashboard" class="btn btn-secondary">Back to Dashboard</a>
-        </div>
+        <!-- Options -->
+        <ul class="list-group">
+            {% set user_sel = question.selected %}
+
+            {% for i in range(0, question.options|length) %}
+                {% set opt_index = i + 1 %}
+                {% set opt_text = question.options[i] %}
+
+                <li class="list-group-item
+                    {% if opt_index == question.correct_option %}
+                        list-group-item-success fw-bold
+                    {% elif user_sel == opt_index %}
+                        list-group-item-danger
+                    {% endif %}
+                ">
+
+                    {{ opt_index }}) {{ opt_text }}
+
+                    {% if opt_index == question.correct_option %}
+                        <span class="ms-2 text-success fw-bold">✔ Correct</span>
+                    {% endif %}
+
+                    {% if user_sel == opt_index %}
+                        <span class="ms-2 text-primary">← Your Answer</span>
+                    {% endif %}
+
+                </li>
+            {% endfor %}
+        </ul>
 
     </div>
+    {% endfor %}
+
+    <!-- Back Button -->
+    <div class="text-center mt-4">
+        <a href="/user/dashboard" class="btn btn-secondary">
+            Back to Dashboard
+        </a>
+    </div>
+
+</div>
+
 </body>
 </html>
