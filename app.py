@@ -1557,6 +1557,43 @@ def delete_question(question_id):
 
 
 
+@app.route("/edit/question/<int:question_id>", methods=["GET", "POST"])
+def edit_question(question_id):
+    question = Question.query.get_or_404(question_id)
+
+    if request.method == "POST":
+        # Update text question
+        question_text = request.form.get("quiz_name")
+        if question_text:
+            question.question_statement = question_text
+
+        # Update options
+        question.option_1 = request.form.get("option_1")
+        question.option_2 = request.form.get("option_2")
+        question.option_3 = request.form.get("option_3")
+        question.option_4 = request.form.get("option_4")
+
+        # Correct option
+        correct_option = request.form.get("correct_option")
+        if correct_option:
+           question.correct_option = int(correct_option)
+
+        file = request.files.get("question_image")
+        if file and file.filename != "" and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            question.question_image = filename
+
+          
+
+        db.session.commit()
+        return redirect("/admin/dashboard")
+
+    # Render the form with existing values
+    return render_template("edit_question.html", question=question)
+
+
+
 
 # ===================== DEBUG ROUTE =====================
 @app.route('/debug/db')
