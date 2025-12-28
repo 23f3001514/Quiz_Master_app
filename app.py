@@ -990,19 +990,28 @@ class Chapter(db.Model):
     title = db.Column(db.String(50) , nullable = False)
     quiz_id = db.Column(db.Integer , db.ForeignKey('quiz.id') , nullable = False)
 
+
+
+
 class Question(db.Model):
     id = db.Column(db.Integer , primary_key = True)
     quiz_id = db.Column(db.Integer , db.ForeignKey('quiz.id') , nullable = False)
     chapter_id = db.Column(db.Integer , db.ForeignKey('chapter.id') , nullable = False)
+
     question_statement = db.Column(db.Text , nullable = True)
     question_image = db.Column(db.String(100), nullable=True)
+
     option_1 = db.Column(db.String(50) , nullable = False)
     option_2 = db.Column(db.String(50) , nullable = False)
     option_3 = db.Column(db.String(50) , nullable = False)
     option_4 = db.Column(db.String(50) , nullable = False)
+
     correct_option = db.Column(db.Integer , nullable = False)
+    explanation = db.Column(db.Text, nullable=True)
+
     quiz = db.relationship('Quiz' , backref='questions')
     chapter = db.relationship('Chapter' , backref='questions')
+
 
 class QuizAttempt(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -1153,9 +1162,18 @@ def user_dashboard():
         ).all()
     else:
         quizzes = Quiz.query.all()
+
+
+    attempts = QuizAttempt.query.filter_by(user_id=session['user_id']).order_by(QuizAttempt.timestamp.desc()).all()
+    # 🔥 attach total questions to each attempt
+    for attempt in attempts:
+        if attempt.chapter:
+            attempt.total_questions = len(attempt.chapter.questions)
+        else:
+            attempt.total_questions = 0
+
     
     # 🔥 Get all attempts for the logged-in user
-    attempts = QuizAttempt.query.filter_by(user_id=session['user_id']).order_by(QuizAttempt.timestamp.desc()).all()
 
     return render_template(
         'user_dashboard.html', 
@@ -1189,26 +1207,34 @@ def chapter_wise_quiz(quiz_id):
 
     return render_template('chapter_wise_quiz.html', quiz=quiz, chapters=chapters, search_query=search_query)
 
+
+
+
 # ---------------- LEADERBOARD ----------------
-@app.route('/leaderboard/<int:quiz_id>')
-def leaderboard(quiz_id):
+
+@app.route('/leaderboard/<int:quiz_id>/<int:chapter_id>')
+def leaderboard(quiz_id, chapter_id):
     if 'user_id' not in session:
         return redirect('/user/login')
 
     quiz = Quiz.query.get_or_404(quiz_id)
+    chapter = Chapter.query.get_or_404(chapter_id)
 
-    # Fetch top 10 attempts (highest score first, earlier attempt wins tie)
-    top_attempts = QuizAttempt.query.filter_by(quiz_id=quiz_id).order_by(
+    # ✅ ONLY same quiz + same chapter
+    top_attempts = QuizAttempt.query.filter_by(
+        quiz_id=quiz_id,
+        chapter_id=chapter_id
+    ).order_by(
         QuizAttempt.score.desc(),
         QuizAttempt.timestamp.asc()
     ).limit(10).all()
 
-    # 🔥 IMPORTANT: pass current user id
     current_user_id = session.get('user_id')
 
     return render_template(
         'leaderboard.html',
         quiz=quiz,
+        chapter=chapter,
         top_attempts=top_attempts,
         current_user_id=current_user_id
     )
@@ -1255,14 +1281,17 @@ def answer_key(attempt_id):
         else:
             wrong += 1
 
+
         detailed_questions.append({
-            "id": q.id,   # ✅ ADD THIS
+            "id": q.id,
             "question_statement": q.question_statement,
             "question_image": q.question_image,
             "options": [q.option_1, q.option_2, q.option_3, q.option_4],
             "correct_option": q.correct_option,
-            "selected": selected
+            "selected": selected,
+            "explanation": q.explanation
         })
+
 
     # ACCURACY CALCULATION
     accuracy = round((correct / total) * 100, 2) if total else 0
@@ -1382,6 +1411,7 @@ def add_chapter(quiz_id):
         return redirect('/admin/dashboard')
     return render_template('add_chapter.html' , quiz=quiz)
 
+
 @app.route('/add/question/<int:quiz_id>/<int:chapter_id>', methods=['GET', 'POST'])
 def add_question(quiz_id, chapter_id):
     if 'admin_id' not in session:
@@ -1414,7 +1444,8 @@ def add_question(quiz_id, chapter_id):
                 option_2=option_2,
                 option_3=option_3,
                 option_4=option_4,
-                correct_option=int(correct_option)
+                correct_option=int(correct_option),
+                explanation=request.form.get("explanation")
             )
             db.session.add(new_question)
             db.session.commit()
@@ -1558,7 +1589,7 @@ def delete_question(question_id):
 
 
 
-
+# ========================== Edit Question Route ==========================
 
 @app.route("/edit/question/<int:question_id>", methods=["GET", "POST"])
 def edit_question(question_id):
@@ -1566,6 +1597,7 @@ def edit_question(question_id):
 
     if request.method == "POST":
         # Update text question
+        question.explanation = request.form.get("explanation")
         question_text = request.form.get("quiz_name")
         if question_text:
             question.question_statement = question_text

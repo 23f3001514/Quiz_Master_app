@@ -193,7 +193,7 @@
         <tr>
           <td>{{ attempt.quiz.title }}</td>
           <td>{{ attempt.chapter.title if attempt.chapter else 'N/A' }}</td>
-          <td><span class="badge bg-success">{{ attempt.score }}</span></td>
+          <td><span class="badge bg-success">{{ attempt.score }} / {{ attempt.total_questions }}</span></td>
           <td>{{ attempt.timestamp.strftime("%d %b %Y") }}</td>
           <td>
             <a href="{{ url_for('answer_key', attempt_id=attempt.id) }}"

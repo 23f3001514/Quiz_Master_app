@@ -56,6 +56,11 @@
                 <input type="text" class="form-control" name="option_4" placeholder="Enter option number 4" required>
             </div>
             <div class="mb-3">
+                <label class="form-label">Explanation</label>
+                <textarea class="form-control" name="explanation" rows="3">{{ question.explanation }}</textarea>
+            </div>
+
+            <div class="mb-3">
                 <label class="form-label">CORRECT OPTION (1-4) :</label>
                 <input type="text" class="form-control" name="correct_option" placeholder="Correct option number" required>
             </div>
