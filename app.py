@@ -940,25 +940,39 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 
 # -------------------- SECRET KEY -----------------------------
-app.secret_key = 'secret_key_for_session'
+#app.secret_key = 'secret_key_for_session'
+app.secret_key = os.environ.get("SECRET_KEY", "fallback_secret_key")
+
+
+
+database_url = os.environ.get("DATABASE_URL")
+
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url or "sqlite:///quiz.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+
+
 
 # -------------------- DATABASE CONFIGURATION (FIXED!) -------------------
 # Get database URL from environment variable (Render sets this automatically)
-database_url = os.environ.get('DATABASE_URL')
+# database_url = os.environ.get('DATABASE_URL')
 
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
-    "DATABASE_URL",
-    "sqlite:///quiz.db"
-)
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+#     "DATABASE_URL",
+#     "sqlite:///quiz.db"
+# )
 
 
-# Fix for SQLAlchemy (Render uses 'postgres://' but SQLAlchemy needs 'postgresql://')
-if database_url and database_url.startswith('postgres://'):
-    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+# # Fix for SQLAlchemy (Render uses 'postgres://' but SQLAlchemy needs 'postgresql://')
+# if database_url and database_url.startswith('postgres://'):
+#     database_url = database_url.replace('postgres://', 'postgresql://', 1)
 
-# Use PostgreSQL in production, SQLite for local development
-app.config["SQLALCHEMY_DATABASE_URI"] = database_url or "sqlite:///quiz.db"
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# # Use PostgreSQL in production, SQLite for local development
+# app.config["SQLALCHEMY_DATABASE_URI"] = database_url or "sqlite:///quiz.db"
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
@@ -967,7 +981,7 @@ db = SQLAlchemy(app)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+#os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -1137,7 +1151,7 @@ def admin_login():
 @app.route('/admin/dashboard')
 def admin_dashboard():
     if 'admin_id' not in session:
-        redirect('/admin/login')
+        return redirect('/admin/login')
 
     search_query = request.args.get('search' ,'').strip().lower()
 
