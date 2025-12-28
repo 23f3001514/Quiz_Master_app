@@ -946,6 +946,12 @@ app.secret_key = 'secret_key_for_session'
 # Get database URL from environment variable (Render sets this automatically)
 database_url = os.environ.get('DATABASE_URL')
 
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+    "DATABASE_URL",
+    "sqlite:///quiz.db"
+)
+
+
 # Fix for SQLAlchemy (Render uses 'postgres://' but SQLAlchemy needs 'postgresql://')
 if database_url and database_url.startswith('postgres://'):
     database_url = database_url.replace('postgres://', 'postgresql://', 1)
@@ -957,7 +963,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # -------------------- UPLOAD CONFIG --------------------------
-UPLOAD_FOLDER = 'static/uploads'
+#UPLOAD_FOLDER = 'static/uploads'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -971,14 +982,17 @@ def allowed_file(filename):
 class User(db.Model):
     id = db.Column(db.Integer , primary_key = True)
     username = db.Column(db.String(50) , nullable = False , unique=True)
-    password = db.Column(db.Integer , unique = True , nullable = False)
+    #password = db.Column(db.Integer , unique = True , nullable = False)
+    password = db.Column(db.String(100), nullable=False)
     fullname = db.Column(db.String(50) , nullable = False)
     dob = db.Column(db.Date , nullable = False)
 
 class Admin(db.Model):
     id = db.Column(db.Integer , primary_key = True)
     username = db.Column(db.String(100) , nullable = False)
-    password = db.Column(db.Integer , nullable = False , unique = True)
+    #password = db.Column(db.Integer , nullable = False , unique = True)
+    password = db.Column(db.String(100), nullable=False)
+
 
 class Quiz(db.Model):
     id = db.Column(db.Integer , primary_key= True)
@@ -1648,13 +1662,16 @@ def debug_db():
     return json.dumps(data, indent=4)
 
 # ---------------- MAIN ----------------
-if __name__ == '__main__':
-    with app.app_context():
+
+with app.app_context():
         db.create_all()
         if not Admin.query.first():
             default_admin = Admin(username='admin', password='admin123')
             db.session.add(default_admin)
             db.session.commit()
-    app.run(debug=True)
+
+
+if __name__ == '__main__':
+    app.run()
 
 
