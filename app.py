@@ -40,7 +40,9 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# ----------------------------- MODELS -----------------------------
+
+
+#----------------------------- MODELS -----------------------------
 class User(db.Model):
     id = db.Column(db.Integer , primary_key = True)
     username = db.Column(db.String(50) , nullable = False , unique=True)
@@ -720,7 +722,7 @@ def debug_db():
 
     return json.dumps(data, indent=4)
 
-# ---------------- MAIN ----------------
+#---------------- MAIN ----------------
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
