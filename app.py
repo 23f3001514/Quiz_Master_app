@@ -881,6 +881,20 @@ class QuizAttempt(db.Model):
     chapter = db.relationship('Chapter', backref='attempts')
 
 
+
+with app.app_context():
+    db.create_all()
+
+    if not Admin.query.first():
+        default_admin_password = os.environ.get('ADMIN_PASSWORD', 'admin123')
+        hashed_password = generate_password_hash(default_admin_password)
+        default_admin = Admin(username='admin', password=hashed_password)
+        db.session.add(default_admin)
+        db.session.commit()
+        print("✅ Default admin created!")
+
+
+
 # ===================== ERROR HANDLERS ================================
 @app.errorhandler(404)
 def not_found(e):
@@ -1576,23 +1590,27 @@ def edit_question(question_id):
 
 
 #---------------- MAIN ----------------
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
+# if __name__ == '__main__':
+#     with app.app_context():
+#         db.create_all()
         
-        # Create default admin if not exists (SECURE!)
-        if not Admin.query.first():
-            default_admin_password = os.environ.get('ADMIN_PASSWORD', 'admin123')
-            hashed_password = generate_password_hash(default_admin_password)
-            default_admin = Admin(username='admin', password=hashed_password)
-            db.session.add(default_admin)
-            db.session.commit()
-            print("✅ Default admin created!")
-            print(f"   Username: admin")
-            print(f"   Password: {default_admin_password}")
-            print("   ⚠️  CHANGE THIS PASSWORD IMMEDIATELY!")
+#         # Create default admin if not exists (SECURE!)
+#         if not Admin.query.first():
+#             default_admin_password = os.environ.get('ADMIN_PASSWORD', 'admin123')
+#             hashed_password = generate_password_hash(default_admin_password)
+#             default_admin = Admin(username='admin', password=hashed_password)
+#             db.session.add(default_admin)
+#             db.session.commit()
+#             print("✅ Default admin created!")
+#             print(f"   Username: admin")
+#             print(f"   Password: {default_admin_password}")
+#             print("   ⚠️  CHANGE THIS PASSWORD IMMEDIATELY!")
     
-    # Only use debug=True in development
-    app.run(debug=os.environ.get('FLASK_ENV') != 'production')
+#     # Only use debug=True in development
+#     app.run(debug=os.environ.get('FLASK_ENV') != 'production')
 
 
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
