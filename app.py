@@ -762,19 +762,31 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent XSS
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # CSRF protection
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)  # 30 min timeout
 
-# -------------------- DATABASE CONFIGURATION (FIXED!) -------------------
-database_url = os.environ.get('DATABASE_URL')
 
-# Fix for SQLAlchemy (Render uses 'postgres://' but SQLAlchemy needs 'postgresql://')
-if database_url and database_url.startswith('postgres://'):
-    database_url = database_url.replace('postgres://', 'postgresql://', 1)
 
-# Use PostgreSQL in production, SQLite for local development
-app.config["SQLALCHEMY_DATABASE_URI"] = database_url or "sqlite:///quiz.db"
+# ------------- new -------------- 
+
+# -------------------- DATABASE CONFIGURATION -------------------
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:vrCjoVKlclRKhkHyzziljEXWSwnLNwzp@trolley.proxy.rlwy.net:38419/railway"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+
+
+# -------------------- DATABASE CONFIGURATION (FIXED!) -------------------
+# database_url = os.environ.get('DATABASE_URL')
+
+# # Fix for SQLAlchemy (Render uses 'postgres://' but SQLAlchemy needs 'postgresql://')
+# if database_url and database_url.startswith('postgres://'):
+#     database_url = database_url.replace('postgres://', 'postgresql://', 1)
+
+# # Use PostgreSQL in production, SQLite for local development
+# app.config["SQLALCHEMY_DATABASE_URI"] = database_url or "sqlite:///quiz.db"
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# db = SQLAlchemy(app)
+# migrate = Migrate(app, db)
 
 # -------------------- UPLOAD CONFIG --------------------------
 UPLOAD_FOLDER = 'static/uploads'
