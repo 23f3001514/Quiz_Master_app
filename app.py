@@ -763,30 +763,19 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # CSRF protection
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)  # 30 min timeout
 
 
+# -------------------- DATABASE CONFIGURATION (FIXED!) -------------------
+database_url = os.environ.get('DATABASE_URL')
 
-# ------------- new -------------- 
+# Fix for SQLAlchemy (Render uses 'postgres://' but SQLAlchemy needs 'postgresql://')
+if database_url and database_url.startswith('postgres://'):
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
 
-# -------------------- DATABASE CONFIGURATION -------------------
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:vrCjoVKlclRKhkHyzziljEXWSwnLNwzp@trolley.proxy.rlwy.net:38419/railway"
+# Use PostgreSQL in production, SQLite for local development
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url or "sqlite:///quiz.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-
-
-# -------------------- DATABASE CONFIGURATION (FIXED!) -------------------
-# database_url = os.environ.get('DATABASE_URL')
-
-# # Fix for SQLAlchemy (Render uses 'postgres://' but SQLAlchemy needs 'postgresql://')
-# if database_url and database_url.startswith('postgres://'):
-#     database_url = database_url.replace('postgres://', 'postgresql://', 1)
-
-# # Use PostgreSQL in production, SQLite for local development
-# app.config["SQLALCHEMY_DATABASE_URI"] = database_url or "sqlite:///quiz.db"
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# db = SQLAlchemy(app)
-# migrate = Migrate(app, db)
 
 # -------------------- UPLOAD CONFIG --------------------------
 UPLOAD_FOLDER = 'static/uploads'
@@ -881,17 +870,6 @@ class QuizAttempt(db.Model):
     chapter = db.relationship('Chapter', backref='attempts')
 
 
-
-with app.app_context():
-    db.create_all()
-
-    if not Admin.query.first():
-        default_admin_password = os.environ.get('ADMIN_PASSWORD', 'admin123')
-        hashed_password = generate_password_hash(default_admin_password)
-        default_admin = Admin(username='admin', password=hashed_password)
-        db.session.add(default_admin)
-        db.session.commit()
-        print("✅ Default admin created!")
 
 
 
@@ -1590,27 +1568,23 @@ def edit_question(question_id):
 
 
 #---------------- MAIN ----------------
-# if __name__ == '__main__':
-#     with app.app_context():
-#         db.create_all()
-        
-#         # Create default admin if not exists (SECURE!)
-#         if not Admin.query.first():
-#             default_admin_password = os.environ.get('ADMIN_PASSWORD', 'admin123')
-#             hashed_password = generate_password_hash(default_admin_password)
-#             default_admin = Admin(username='admin', password=hashed_password)
-#             db.session.add(default_admin)
-#             db.session.commit()
-#             print("✅ Default admin created!")
-#             print(f"   Username: admin")
-#             print(f"   Password: {default_admin_password}")
-#             print("   ⚠️  CHANGE THIS PASSWORD IMMEDIATELY!")
-    
-#     # Only use debug=True in development
-#     app.run(debug=os.environ.get('FLASK_ENV') != 'production')
-
-
-
-
 if __name__ == '__main__':
-    app.run(debug=True)
+    with app.app_context():
+        db.create_all()
+        
+        # Create default admin if not exists (SECURE!)
+        if not Admin.query.first():
+            default_admin_password = os.environ.get('ADMIN_PASSWORD', 'admin123')
+            hashed_password = generate_password_hash(default_admin_password)
+            default_admin = Admin(username='admin', password=hashed_password)
+            db.session.add(default_admin)
+            db.session.commit()
+            print("✅ Default admin created!")
+            print(f"   Username: admin")
+            print(f"   Password: {default_admin_password}")
+            print("   ⚠️  CHANGE THIS PASSWORD IMMEDIATELY!")
+    
+    # Only use debug=True in development
+    app.run(debug=os.environ.get('FLASK_ENV') != 'production')
+
+
