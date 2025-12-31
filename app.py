@@ -790,6 +790,11 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+
+
+
+
+
 # -------------------- SECURITY DECORATORS --------------------------
 def login_required(f):
     """Decorator to require user login"""
@@ -871,6 +876,12 @@ class QuizAttempt(db.Model):
 
 
 
+try:
+    with app.app_context():
+        db.session.execute("SELECT 1")
+    print("✅ Database connection OK")
+except Exception as e:
+    print("❌ Database connection failed:", e)
 
 
 # ===================== ERROR HANDLERS ================================
