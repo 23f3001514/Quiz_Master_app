@@ -33,29 +33,10 @@
             color: #fff;
         }
 
-        .login-card h2 {
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .login-card p {
-            font-size: 0.95rem;
-            opacity: 0.9;
-        }
-
-        label {
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
         .form-control {
             border-radius: 10px;
             padding: 10px 12px;
             border: none;
-        }
-
-        .form-control:focus {
-            box-shadow: 0 0 0 0.2rem rgba(13,110,253,.25);
         }
 
         .btn-login {
@@ -72,18 +53,7 @@
 
         .link-text a {
             color: #20c997;
-            font-weight: 500;
             text-decoration: none;
-        }
-
-        .link-text a:hover {
-            text-decoration: underline;
-        }
-
-        @media (max-width: 576px) {
-            .login-card {
-                padding: 30px 20px;
-            }
         }
     </style>
 </head>
@@ -92,28 +62,36 @@
 
 <div class="login-card">
 
-    <!-- Title -->
     <h2 class="text-center">Welcome Back 👋</h2>
     <p class="text-center mb-4">Login to continue your Quiz Master journey</p>
 
-    <!-- Form -->
+    <!-- 🔥 FLASH MESSAGES (THIS WAS MISSING) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} text-center">
+            {{ message }}
+        </div>
+      {% endfor %}
+    {% endwith %}
+
     <form method="POST">
 
         <div class="mb-3">
             <label>Username</label>
-            <input type="text" name="username" class="form-control" placeholder="Enter your username" required>
+            <input type="text" name="username" class="form-control"
+                   placeholder="Enter your username" required>
         </div>
 
         <div class="mb-3">
             <label>Password</label>
-            <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
+            <input type="password" name="password" class="form-control"
+                   placeholder="Enter your password" required>
         </div>
 
         <div class="d-grid mt-4">
             <button type="submit" class="btn btn-login">Login</button>
         </div>
 
-        <!-- Links -->
         <div class="text-center mt-3 link-text">
             <a href="{{ url_for('forgot_password') }}">Forgot Password?</a>
         </div>
@@ -121,13 +99,6 @@
         <div class="text-center mt-2 link-text">
             Don’t have an account? <a href="/user/register">Create one</a>
         </div>
-
-        <!-- Error -->
-        {% if error %}
-        <div class="alert alert-danger mt-3 text-center">
-            {{ error }}
-        </div>
-        {% endif %}
 
     </form>
 
